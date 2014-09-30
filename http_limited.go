@@ -2,6 +2,7 @@ package source
 
 import "io"
 import "github.com/gozips/source"
+import "github.com/gozips/sources"
 
 // LimitedCloser is a wrapper around LimitedReader to implement ReadCloser
 type LimitedCloser struct {
@@ -14,23 +15,19 @@ func (l LimitedCloser) Read(b []byte) (int, error) {
 }
 
 // HTTPlimited returns an http body that reads only up to n
-func HTTPlimited(n int64) func(string) (string, interface{}) {
-	return func(urlStr string) (string, interface{}) {
-		name, r := source.HTTP(urlStr)
+func HTTPlimited(n int64) source.Func {
+	return func(urlStr string) (string, io.ReadCloser, error) {
+		var c LimitedCloser
 
-		switch v := r.(type) {
-		case io.ReadCloser:
-			l := &io.LimitedReader{v, n}
-			c := LimitedCloser{
+		name, r, err := sources.HTTP(urlStr)
+		if r != nil {
+			l := &io.LimitedReader{r, n}
+			c = LimitedCloser{
 				l,
-				v,
+				r,
 			}
-			return name, c
-
-		case error:
-			return name, v
 		}
 
-		return "", nil
+		return name, c, err
 	}
 }
