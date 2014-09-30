@@ -1,9 +1,9 @@
-# gozip-sources
+# gozips-sources
 
-[![Build Status](https://travis-ci.org/nowk/gozip-sources.svg?branch=master)](https://travis-ci.org/nowk/gozip-sources)
-[![GoDoc](https://godoc.org/github.com/nowk/gozip-sources?status.svg)](http://godoc.org/github.com/nowk/gozip-sources)
+[![Build Status](https://travis-ci.org/nowk/gozips-sources.svg?branch=master)](https://travis-ci.org/nowk/gozips-sources)
+[![GoDoc](https://godoc.org/github.com/nowk/gozips-sources?status.svg)](http://godoc.org/github.com/nowk/gozips-sources)
 
-Source funcs for [gozip](https://github.com/gozips)
+Source funcs for [gozips](https://github.com/gozips)
 
 ## HTTPlimited
 
