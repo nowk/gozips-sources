@@ -51,7 +51,7 @@ func TestLimitsBodyToN(t *testing.T) {
 }
 
 func TestHTTPClientError(t *testing.T) {
-	reg := regexp.MustCompile(`Get http:\/\/unreachable:( dial tcp:)? lookup unreachable: no such host`)
+	reg := regexp.MustCompile("Get http://unreachable: lookup unreachable: no such host")
 
 	// fails if ISP picks up and redirects to search, which TWC does
 	name, v, err := HTTPlimited(4)("http://unreachable")
