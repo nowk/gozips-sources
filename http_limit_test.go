@@ -83,19 +83,18 @@ func TestFileExeedsByteLimit(t *testing.T) {
 func TestHTTPClientError(t *testing.T) {
 	reg := regexp.MustCompile(`Get http:\/\/unreachable:( dial tcp:)? lookup unreachable: no such host`)
 
-	// fails if ISP picks up and redirects to search, which TWC does
-	name, v, err := HTTPLimit(4)("http://unreachable")
+	// NOTE fails if ISP picks up and redirects to search, which TWC does
+	name, r, err := HTTPLimit(4)("http://unreachable")
+	defer r.Close()
+
 	assert.Equal(t, "unreachable.txt", name)
 	if !reg.MatchString(err.Error()) {
 		t.Errorf("Expected %s to match %s", err.Error(), reg.String())
 	}
 
 	b := make([]byte, 32*1024)
-	r := v.(io.ReadCloser)
 	n, _ := r.Read(b)
 	if str := string(b[:n]); !reg.MatchString(str) {
 		t.Errorf("Expected %s to match %s", str, reg.String())
 	}
-
-	r.Close()
 }
