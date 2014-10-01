@@ -8,7 +8,7 @@ Source funcs for [gozips](https://github.com/gozips)
 ## HTTPLimit
 
     out := new(bytes.Buffer)
-    zip := gozips.NewZip(source.HTTPLimit(1024))
+    zip := gozips.NewZip(sources.HTTPLimit(1024))
     zip.Add(url1)
     zip.Add(url2, url3)
     n, err := zip.WriteTo(out)
