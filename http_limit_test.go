@@ -7,8 +7,6 @@ import "net/http"
 import "net/http/httptest"
 import "regexp"
 import "testing"
-import "github.com/gozips/zips"
-import gozipt "github.com/gozips/testing"
 import "github.com/nowk/assert"
 
 func h(str string) func(http.ResponseWriter, *http.Request) {
@@ -27,27 +25,58 @@ func tServer() (ts *httptest.Server) {
 	return
 }
 
-func TestLimitsBodyToN(t *testing.T) {
+func TestFileIsWithinLimits(t *testing.T) {
 	ts := tServer()
 	defer ts.Close()
 
-	url1 := fmt.Sprintf("%s/index.html", ts.URL)
-	url2 := fmt.Sprintf("%s/posts", ts.URL)
-	url3 := fmt.Sprintf("%s/api/data.json", ts.URL)
+	for _, v := range []struct {
+		u, n, m string
+	}{
+		{"/index.html", "index.html", "Hello World!"},
+		{"/posts", "posts", "Post Body"},
+		{"/api/data.json", "data.json", `{"data": ["one"]}`},
+	} {
+		url := fmt.Sprintf("%s%s", ts.URL, v.u)
+		l := int64(len(v.m))
+		name, r, _ := HTTPLimit(l)(url)
+		defer r.Close()
 
-	out := new(bytes.Buffer)
-	zip := zips.NewZip(HTTPLimit(2))
-	zip.Add(url1)
-	zip.Add(url2, url3)
-	n, err := zip.WriteTo(out)
+		var b []byte
+		buf := bytes.NewBuffer(b)
+		n, err := io.Copy(buf, r)
 
-	assert.Nil(t, err)
-	assert.Equal(t, int64(6), n)
-	gozipt.VerifyZip(t, out.Bytes(), []gozipt.Entries{
-		{"index.html", "He"},
-		{"posts", "Po"},
-		{"data.json", `{"`},
-	})
+		assert.Nil(t, err)
+		assert.Equal(t, l, n)
+		assert.Equal(t, v.n, name)
+		assert.Equal(t, v.m, buf.String())
+	}
+}
+
+func TestFileExeedsByteLimit(t *testing.T) {
+	ts := tServer()
+	defer ts.Close()
+
+	for _, v := range []struct {
+		u, n, m string
+	}{
+		{"/index.html", "index.html", "Hello World!"},
+		{"/posts", "posts", "Post Body"},
+		{"/api/data.json", "data.json", `{"data": ["one"]}`},
+	} {
+		url := fmt.Sprintf("%s%s", ts.URL, v.u)
+		l := int64(len(v.m)) - 2
+		name, r, _ := HTTPLimit(l)(url)
+		defer r.Close()
+
+		var b []byte
+		buf := bytes.NewBuffer(b)
+		n, err := io.Copy(buf, r)
+
+		assert.Equal(t, "error: limit: exceeded allowable read limit", err.Error())
+		assert.Equal(t, l, n)
+		assert.Equal(t, v.n, name)
+		assert.Equal(t, v.m[:l], buf.String())
+	}
 }
 
 func TestHTTPClientError(t *testing.T) {

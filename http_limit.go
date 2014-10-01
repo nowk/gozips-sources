@@ -10,8 +10,22 @@ type LimitedCloser struct {
 	io.ReadCloser
 }
 
+// Read delegates to LimitedReader, at EOF it tries to read an extra byte. If
+// the read returns 1, means file exceeds the limit and source.Error is
+// returned
 func (l LimitedCloser) Read(b []byte) (int, error) {
-	return l.LimitedReader.Read(b)
+	n, err := l.LimitedReader.Read(b)
+	if err == io.EOF {
+		r := l.LimitedReader.R
+		m, _ := r.Read(make([]byte, 1))
+		if m > 0 {
+			return n, source.Error{
+				Message: "error: limit: exceeded allowable read limit",
+			}
+		}
+	}
+
+	return n, err
 }
 
 // HTTPLimit returns an http body that reads only up to n
