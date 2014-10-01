@@ -8,12 +8,12 @@ Source funcs for [gozips](https://github.com/gozips)
 ## HTTPLimit
 
     out := new(bytes.Buffer)
-    zip := NewZip(source.HTTPLimit(1024))
+    zip := gozips.NewZip(source.HTTPLimit(1024))
     zip.Add(url1)
     zip.Add(url2, url3)
     n, err := zip.WriteTo(out)
 
-    // each entries written will be truncated to 1024 bytes
+    // each entry written will be truncated to 1024 bytes
 
 ## License
 
