@@ -73,6 +73,7 @@ func TestFileExeedsByteLimit(t *testing.T) {
 		n, err := io.Copy(buf, r)
 
 		assert.Equal(t, "error: limit: exceeded allowable read limit", err.Error())
+		assert.TypeOf(t, "source.ReadError", err)
 		assert.Equal(t, l, n)
 		assert.Equal(t, v.n, name)
 		assert.Equal(t, v.m[:l], buf.String())

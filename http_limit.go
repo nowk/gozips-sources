@@ -19,7 +19,7 @@ func (l LimitedCloser) Read(b []byte) (int, error) {
 		r := l.LimitedReader.R
 		m, _ := r.Read(make([]byte, 1))
 		if m > 0 {
-			return n, source.Error{
+			return n, source.ReadError{
 				Message: "error: limit: exceeded allowable read limit",
 			}
 		}
