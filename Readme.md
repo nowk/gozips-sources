@@ -5,10 +5,10 @@
 
 Source funcs for [gozips](https://github.com/gozips)
 
-## HTTPlimited
+## HTTPLimit
 
     out := new(bytes.Buffer)
-    zip := NewZip(source.HTTPlimited(1024))
+    zip := NewZip(source.HTTPLimit(1024))
     zip.Add(url1)
     zip.Add(url2, url3)
     n, err := zip.WriteTo(out)

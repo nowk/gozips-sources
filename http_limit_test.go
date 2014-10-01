@@ -36,7 +36,7 @@ func TestLimitsBodyToN(t *testing.T) {
 	url3 := fmt.Sprintf("%s/api/data.json", ts.URL)
 
 	out := new(bytes.Buffer)
-	zip := zips.NewZip(HTTPlimited(2))
+	zip := zips.NewZip(HTTPLimit(2))
 	zip.Add(url1)
 	zip.Add(url2, url3)
 	n, err := zip.WriteTo(out)
@@ -54,7 +54,7 @@ func TestHTTPClientError(t *testing.T) {
 	reg := regexp.MustCompile(`Get http:\/\/unreachable:( dial tcp:)? lookup unreachable: no such host`)
 
 	// fails if ISP picks up and redirects to search, which TWC does
-	name, v, err := HTTPlimited(4)("http://unreachable")
+	name, v, err := HTTPLimit(4)("http://unreachable")
 	assert.Equal(t, "unreachable.txt", name)
 	if !reg.MatchString(err.Error()) {
 		t.Errorf("Expected %s to match %s", err.Error(), reg.String())

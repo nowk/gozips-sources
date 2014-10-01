@@ -14,8 +14,8 @@ func (l LimitedCloser) Read(b []byte) (int, error) {
 	return l.LimitedReader.Read(b)
 }
 
-// HTTPlimited returns an http body that reads only up to n
-func HTTPlimited(n int64) source.Func {
+// HTTPLimit returns an http body that reads only up to n
+func HTTPLimit(n int64) source.Func {
 	return func(urlStr string) (string, io.ReadCloser, error) {
 		name, r, err := sources.HTTP(urlStr)
 		if err != nil {
