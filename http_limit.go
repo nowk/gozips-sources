@@ -19,9 +19,7 @@ func (l LimitedCloser) Read(b []byte) (int, error) {
 		r := l.LimitedReader.R
 		m, _ := r.Read(make([]byte, 1))
 		if m > 0 {
-			return n, source.ReadError{
-				Message: "error: limit: exceeded allowable read limit",
-			}
+			return n, source.ReadError{"error: limit: exceeded allowable read limit"}
 		}
 	}
 
@@ -36,12 +34,14 @@ func HTTPLimit(n int64) source.Func {
 			return name, r, err
 		}
 
-		l := &io.LimitedReader{r, n}
-		c := LimitedCloser{
-			l,
-			r,
+		lc := LimitedCloser{
+			LimitedReader: &io.LimitedReader{
+				R: r,
+				N: n,
+			},
+			ReadCloser: r,
 		}
 
-		return name, c, err
+		return name, lc, err
 	}
 }
